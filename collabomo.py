@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/collabomo')
 def collabomo():
     if 'username' in session and session['username'] in members:
-        return render_template('omo_collab.html')
+        return render_template('collabomo.html')
     else:
         return 'You are not allowed to view this'
 
