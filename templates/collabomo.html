@@ -4,6 +4,8 @@
     <title> OMO Collaboration </title>
   </head>
   <body>
+    <form method="POST">
+    <input type="submit" value="Submit" />
     <table>
       <tr>
         <th> Question </th>
@@ -18,15 +20,25 @@
       {% for i in range(1, NUM_OF_QUESTIONS + 1) %}
       <tr>
         <td>{{ i }}</td>
+
         {% for m in names %}
+
             {% if answers[m][i] == None %}
-                <td> </td>
+                {% set display = "" %}
             {% else %}
-                <td> {{answers[m][i]}} </td>
+                {% set display = answers[m][i] %}
+            {% endif %}
+
+            {% if m == username %}
+                <td> <input type="text" value="{{display}}" name="answer{{i}}" /></td>
+            {% else %}
+                <td> {{display}}</td>
             {% endif %}
         {% endfor %}
       </tr>
       {% endfor %}
     </table>
+    <input type="submit" value="Submit" />
+    </form>
   </body>
 </html>

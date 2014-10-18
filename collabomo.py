@@ -4,10 +4,20 @@ from flask import Flask, render_template, redirect, url_for, request, session
 
 app = Flask(__name__)
 
-@app.route('/collabomo')
+@app.route('/collabomo', methods=["GET", "POST"])
 def collabomo():
     if 'username' in session and session['username'] in members:
-        return render_template('collabomo.html', names = members, NUM_OF_QUESTIONS = NUM_OF_QUESTIONS, answers = answers)
+        if request.method == 'POST':
+            user = session['username']
+            for i in range(1, NUM_OF_QUESTIONS + 1):
+                new_ans = request.form['answer' + str(i)]
+                answers[user][i] = new_ans
+            with open(ANSWERS_FILE, 'w') as f:
+                f.write(str(answers))
+        return render_template('collabomo.html', names = members,
+                username = session['username'],
+                NUM_OF_QUESTIONS = NUM_OF_QUESTIONS,
+                answers = answers)
     else:
         return 'You are not allowed to view this'
 
@@ -35,14 +45,19 @@ members = list()
 password = ''
 answers = dict()
 NUM_OF_QUESTIONS = 20
+ANSWERS_FILE = 'answerdict'
 with open('secrets') as f:
     secret = f.readline()
     app.secret_key = secret
     for i in range(4):
         members.append(f.readline().strip())
-    for m in members:
-        answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+    with open(ANSWERS_FILE) as f2:
+        answers = eval(f2.readline())
+        if not isinstance(answers, dict):
+            for m in members:
+                answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
     password = f.readline().strip()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
