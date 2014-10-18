@@ -1,3 +1,4 @@
 *.sw*
 secrets
 answerdict
+venv
