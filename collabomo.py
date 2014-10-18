@@ -44,7 +44,7 @@ def index():
 members = list()
 password = ''
 answers = dict()
-NUM_OF_QUESTIONS = 20
+NUM_OF_QUESTIONS = 30
 ANSWERS_FILE = 'answerdict'
 with open('secrets') as f:
     secret = f.readline()
@@ -52,10 +52,15 @@ with open('secrets') as f:
     for i in range(4):
         members.append(f.readline().strip())
     with open(ANSWERS_FILE) as f2:
-        answers = eval(f2.readline())
-        if not isinstance(answers, dict):
+        try:
+            answers = eval(f2.readline())
+            if not isinstance(answers, dict):
+                for m in members:
+                    answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+        except SyntaxError:
             for m in members:
                 answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+
     password = f.readline().strip()
 
 
