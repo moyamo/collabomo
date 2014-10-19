@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# Copyright (c) 2014 Mohammed Yaseen Mowzer
+#
+# This Software is subject to the terms of the MIT License which can be found
+# LICENSE file.
+
 from flask import Flask, render_template, redirect, url_for, request, session
 
 app = Flask(__name__)
