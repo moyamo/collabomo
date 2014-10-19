@@ -34,6 +34,10 @@ def collabomo():
     else:
         return 'You are not allowed to view this'
 
+@app.route('/thread/<questnum>')
+def forum(questnum):
+    return 'This is forum ' + str(questnum)
+
 
 def authenticate(form):
     correct_password = 'password' in form and form['password'] == password
