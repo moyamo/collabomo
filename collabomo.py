@@ -9,65 +9,84 @@ from flask import Flask, render_template, redirect, url_for, request, session
 
 app = Flask(__name__)
 
+
+def save_answers():
+    with open(ANSWERS_FILE, 'w') as f:
+        f.write(str(answers))
+
+
 @app.route('/collabomo', methods=["GET", "POST"])
 def collabomo():
     if 'username' in session and session['username'] in members:
+
         if request.method == 'POST':
             user = session['username']
             for i in range(1, NUM_OF_QUESTIONS + 1):
-                new_ans = request.form['answer' + str(i)]
-                answers[user][i] = new_ans
-            with open(ANSWERS_FILE, 'w') as f:
-                f.write(str(answers))
-        return render_template('collabomo.html', names = members,
+                answers[user][i] = request.form['answer' + str(i)]
+            save_answers()
+
+        return render_template('collabomo.html',
+                names = members,
                 username = session['username'],
                 NUM_OF_QUESTIONS = NUM_OF_QUESTIONS,
                 answers = answers)
+
     else:
         return 'You are not allowed to view this'
+
+
+def authenticate(form):
+    correct_password = 'password' in form and form['password'] == password
+    correct_username  = 'username' in form and form['username'] in members
+    return correct_password and correct_username
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if ('password' in request.form and
-                'username' in request.form and
-                request.form['password'] == password and
-                request.form['username'] in members):
-            username = request.form['username']
-            session['username'] = username
+
+        if authenticate(request.form):
+            session['username'] = request.form['username']
             return redirect(url_for('collabomo'))
+
         else:
-            return render_template('login.html', app_name="Collabomo Access Denied")
+            return render_template('login.html',
+                    app_name="Collabomo Access Denied")
+
     else:
         return render_template('login.html', app_name="Collabomo")
+
 
 @app.route('/')
 def index():
     return redirect(url_for('login'))
+
+def init_answers():
+    for m in members:
+        answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
 
 members = list()
 password = ''
 answers = dict()
 NUM_OF_QUESTIONS = 30
 ANSWERS_FILE = 'answerdict'
+
 with open('secrets') as f:
-    secret = f.readline()
-    app.secret_key = secret
+
+    app.secret_key = f.readline()
+
     for i in range(4):
         members.append(f.readline().strip())
+
     with open(ANSWERS_FILE) as f2:
         try:
             answers = eval(f2.readline())
             if not isinstance(answers, dict):
-                for m in members:
-                    answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+                raise SyntaxError()
         except SyntaxError:
-            for m in members:
-                answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+            init_answers()
 
     password = f.readline().strip()
-
 
 if __name__ == '__main__':
     app.run(debug=True)
