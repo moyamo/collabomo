@@ -1,0 +1,25 @@
+<!DOCTYPE>
+<html>
+  <head>
+	  <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+    <title> {{ app_name }} login page</title>
+  </head>
+  <body>
+    <h1> {{ app_name }} Forum Thread: Question {{ question }} </h1>
+    <p>
+     <a href="/collabomo">Back to Home </a>
+    </p>
+    <form method="POST">
+      {% for user, post, time in posts %}
+      <div> <strong>{{ user }} {{time}}</strong></div>
+      <p>
+      <div> {{ post }} </div>
+      </p>
+      {% endfor %}
+      <textarea name="posttext" cols=72 rows=8></textarea>
+      <input type="submit" value="Submit"/>
+    </form>
+  </body>
+</html>

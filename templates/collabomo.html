@@ -16,6 +16,7 @@
         {% for m in names %}
             <th> {{ m }} </th>
         {% endfor %}
+        <th > Last Post </th>
       </tr>
       {% for i in range(1, NUM_OF_QUESTIONS + 1) %}
       <tr>
@@ -35,7 +36,7 @@
                 <td> {{display}}</td>
             {% endif %}
         {% endfor %}
-	<td> <a href="thread/{{i}}"> thread </a></td>
+	<td> <a href="thread/{{i}}"> {{times[i]}} </a></td>
       </tr>
       {% endfor %}
     </table>

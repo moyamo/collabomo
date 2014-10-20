@@ -6,6 +6,8 @@
 # LICENSE file.
 
 from flask import Flask, render_template, redirect, url_for, request, session
+import os
+import datetime
 
 app = Flask(__name__)
 
@@ -29,14 +31,27 @@ def collabomo():
                 names = members,
                 username = session['username'],
                 NUM_OF_QUESTIONS = NUM_OF_QUESTIONS,
+                times = ["No posts" if len(t) <= 0 else str(t[-1][0]) + ' ' +  str(t[-1][2]) for t in forum_threads ],
                 answers = answers)
 
     else:
         return 'You are not allowed to view this'
 
-@app.route('/thread/<questnum>')
+@app.route('/thread/<questnum>', methods=["GET", "POST"])
 def forum(questnum):
-    return 'This is forum ' + str(questnum)
+    try:
+        number = int(questnum)
+        if request.method == "POST":
+            text = request.form["posttext"]
+            user = session['username']
+            if user in members:
+                post_to_forum(user, text, number)
+        return render_template('thread.html',
+                app_name = "Collabomo",
+                question = questnum,
+                posts = forum_threads[number])
+    except SyntaxError:
+        return "Page not found"
 
 
 def authenticate(form):
@@ -69,11 +84,31 @@ def init_answers():
     for m in members:
         answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
 
+forum_path = 'posts/'
+def read_forum_data():
+    forum_data = list()
+    for i in range(NUM_OF_QUESTIONS + 1):
+        filename = forum_path + str(i)
+        if os.path.exists(filename):
+            with open(filename) as f:
+                forum_data.append(eval(f.readline()))
+        else:
+            forum_data.append(list())
+    return forum_data
+
+def post_to_forum(user, text, thread):
+    forum_threads[thread].append((user, text, datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))))
+    with open(forum_path + str(thread), 'w') as f:
+        f.write(str(forum_threads[thread]))
+        
+
 members = list()
 password = ''
 answers = dict()
 NUM_OF_QUESTIONS = 30
 ANSWERS_FILE = 'answerdict'
+
+forum_threads = read_forum_data()
 
 with open('secrets') as f:
 
