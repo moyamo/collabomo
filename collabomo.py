@@ -9,12 +9,29 @@ from flask import Flask, render_template, redirect, url_for, request, session
 import os
 import datetime
 
+
 app = Flask(__name__)
 
 
-def save_answers():
-    with open(ANSWERS_FILE, 'w') as f:
-        f.write(str(answers))
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+
+        if authenticate(request.form):
+            session['username'] = request.form['username']
+            return redirect(url_for('collabomo'))
+
+        else:
+            return render_template('login.html',
+                    app_name="Collabomo Access Denied")
+
+    else:
+        return render_template('login.html', app_name="Collabomo")
 
 
 @app.route('/collabomo', methods=["GET", "POST"])
@@ -36,6 +53,7 @@ def collabomo():
 
     else:
         return 'You are not allowed to view this'
+
 
 @app.route('/thread/<questnum>', methods=["GET", "POST"])
 def forum(questnum):
@@ -60,29 +78,15 @@ def authenticate(form):
     return correct_password and correct_username
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
+def save_answers():
+    with open(ANSWERS_FILE, 'w') as f:
+        f.write(str(answers))
 
-        if authenticate(request.form):
-            session['username'] = request.form['username']
-            return redirect(url_for('collabomo'))
-
-        else:
-            return render_template('login.html',
-                    app_name="Collabomo Access Denied")
-
-    else:
-        return render_template('login.html', app_name="Collabomo")
-
-
-@app.route('/')
-def index():
-    return redirect(url_for('login'))
 
 def init_answers():
     for m in members:
         answers[m] = [None for i in range(NUM_OF_QUESTIONS + 1)]
+
 
 forum_path = 'posts/'
 def read_forum_data():
