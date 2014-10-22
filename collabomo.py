@@ -15,7 +15,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    if 'username' in session and session['username'] in members:
+        return redirect(url_for('collabomo'))
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
