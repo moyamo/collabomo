@@ -4,6 +4,10 @@
     <title> OMO Collaboration </title>
   </head>
   <body>
+    <h1> Collabomo Home </h1>
+    <p>
+    <a href=/logout>Logout</a>
+    </p>
     <form method="POST">
     <input type="submit" value="Submit" />
     <table>
@@ -36,7 +40,7 @@
                 <td> {{display}}</td>
             {% endif %}
         {% endfor %}
-	<td> <a href="thread/{{i}}"> {{times[i]}} </a></td>
+        <td> <a href="thread/{{i}}"> {{times[i]}} </a></td>
       </tr>
       {% endfor %}
     </table>

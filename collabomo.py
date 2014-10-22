@@ -36,6 +36,10 @@ def login():
     else:
         return render_template('login.html', app_name="Collabomo")
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
 @app.route('/collabomo', methods=["GET", "POST"])
 def collabomo():
